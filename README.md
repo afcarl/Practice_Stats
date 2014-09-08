@@ -22,3 +22,9 @@ Evaluating distributions:
 
 
 [Choosing the Correct Statistical Test Reference](http://www-users.cs.umn.edu/~ludford/stat_overview.htm)
+
+
+iPython Notebooks
+=======
+
+[Original iPython Notebook](http://nbviewer.ipython.org/github/nyghtowl/Practice_Stats/blob/master/stats-sprint.ipynb)
