@@ -113,27 +113,42 @@ def fit_the_line(keys, loc_data):
     plt.show()
 
 def check_ks(keys, loc_data):
+    print
+    print "KS Test Distributions"
+    print
     name, data = loc_data
     x = data[:,3]
-    count, bins, ignore= plt.hist(x, 30, color="green", normed=True)
+    fig, axes = plt.subplots(nrows=2, figsize=(6, 12))
+    
+    count, bins, ignore= axes[0].hist(x, 30, color="green", normed=True)
     norm_cdf = st.norm.cdf(bins, np.mean(x), np.std(x))
     data_cdf = np.cumsum(count) * (bins[1] - bins[0])
 
+    axes[1].plot(norm_cdf)
+    axes[1].plot(data_cdf)
+    axes[1].set_title("KS Plot")
+
     d_stat, p_val = st.ks_2samp(data_cdf, norm_cdf)
     
-    print "The distributions are the same = ", ((d_stat > 0.10) and (p_val < 0.05))
+    print "D_stat = ", d_stat, "P_val = ", p_val
+    print "The distributions are the same = ", ((d_stat < 0.20) and (p_val > 0.05))
 
 # Need to sync below with above
-def rank_ks():
-    cleveland = [c_array[:,2], c_array[:,3], c_array[:,5]]
+def rank_ks(loc_data):
+    name, data = loc_data
+    data_per_issue = [data[:,2], data[:,3], data[:,5]]
     labels= ['chest pain', 'resting blood pressure', 'blood sugar']
     results = {}
     
-    for idx, data in enumerate(cleveland):
-        count, bin, ignore = hist(data, 30, color="red", normed=True)
-        
-        norm_cdf = st.norm.cdf(bin, np.mean(data), np.std(data))
-        data_cdf = cumsum(count) * (bin[1] - bin[0])
+    for idx, d in enumerate(data_per_issue):
+        count, d_bin, ignore = plt.hist(d, 30, color="red", normed=True)
+        try:
+            norm_cdf = st.norm.cdf(d_bin, np.mean(data), np.std(data))
+            data_cdf = np.cumsum(count) * (d_bin[1] - d_bin[0])
+        except:
+            print "error", count, d, d_bin
+            data_cdf = 0
+            norm_cdf = 0
         
         # low d_stat or high p_val cannot reject hypothesis - distribution are equal
         ks_stat, p_val = st.ks_2samp(data_cdf, norm_cdf) 
@@ -144,7 +159,7 @@ def rank_ks():
         pvals.append(v[1])
         dvals.append(v[0])
     
-    #plt.imshow([pvals, dvals])
+    plt.imshow([pvals, dvals])
     plt.show()
 
 def main():
@@ -162,7 +177,7 @@ def main():
     blood_pressure(c_keys, loc_data)
     fit_the_line(c_keys, loc_data)
     check_ks(c_keys, one_loc_data)
-    # rank_ks()
+    #rank_ks(one_loc_data)
 
 
 if __name__ == "__main__":
